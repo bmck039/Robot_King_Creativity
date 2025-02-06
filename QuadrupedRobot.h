@@ -1,11 +1,11 @@
-#ifndef Robot_h
-#define Robot_h
+#ifndef QuadrupedRobot_h
+#define QuadrupedRobot_h
 #include "Arduino.h"
 #include "Servo.h"
 
-class Robot {
+class QuadrupedRobot {
     public:
-        Robot(int numLegs, int numJoints);
+        QuadrupedRobot();
         void initialize();
         void stand();
         void moveJoint(int legNum, int jointNum, int angle);
@@ -17,8 +17,8 @@ class Robot {
     private:
         int correctAngle(int legNum, int jointNum, int angle);
         void moveIndex(int i, int angle);
-        Servo motors[][];
+        Servo motors[4][3];
         
-}
+};
 
 #endif
