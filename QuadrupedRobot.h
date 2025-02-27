@@ -13,6 +13,7 @@ class QuadrupedRobot {
         void moveHips(int angle, int moveTime);
         void moveKnees(int angle, int moveTime);
         void moveAnkles(int angle, int moveTime);
+        void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle)
         bool indexIsAtAngle(int i, int angle);
         int delayTime;
     private:
