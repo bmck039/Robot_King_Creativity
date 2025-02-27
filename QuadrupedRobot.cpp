@@ -24,19 +24,9 @@ void QuadrupedRobot::initialize() {
 
 void QuadrupedRobot::stand() {
 
-    if(! QuadrupedRobot::indexIsAtAngle(0, 45)) {
-        QuadrupedRobot::moveHips(45);
-        // delay(QuadrupedRobot::delayTime);
-    } 
-
-    if(! QuadrupedRobot::indexIsAtAngle(1, 0)) {
-        QuadrupedRobot::moveKnees(0);
-        // delay(QuadrupedRobot::delayTime);
-    } 
-    if(! QuadrupedRobot::indexIsAtAngle(2, 90)) {
-        QuadrupedRobot::moveAnkles(90);
-        // delay(QuadrupedRobot::delayTime);
-    }
+    QuadrupedRobot::moveHips(45);
+    QuadrupedRobot::moveKnees(0);
+    QuadrupedRobot::moveAnkles(0);
     QuadrupedRobot::moveKnees(90);
 }
 
@@ -85,6 +75,7 @@ int QuadrupedRobot::correctAngle(int legNum, int jointNum, int angle) {
             }
             break;
         case 1:
+        case 2:
             correctedAngle = 180 - correctedAngle; //for knees: 0 is horizontal
             break;
         
