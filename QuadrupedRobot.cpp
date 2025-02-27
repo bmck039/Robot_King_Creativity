@@ -24,13 +24,18 @@ void QuadrupedRobot::initialize() {
 
 void QuadrupedRobot::stand() {
 
-    if(! QuadrupedRobot::indexIsAtAngle(2, 45)) {
-        QuadrupedRobot::moveAnkles(45);
-        delay(QuadrupedRobot::delayTime);
+    if(! QuadrupedRobot::indexIsAtAngle(0, 45)) {
+        QuadrupedRobot::moveHips(45);
+        // delay(QuadrupedRobot::delayTime);
+    } 
+
+    if(! QuadrupedRobot::indexIsAtAngle(1, 0)) {
+        QuadrupedRobot::moveKnees(0);
+        // delay(QuadrupedRobot::delayTime);
     } 
     if(! QuadrupedRobot::indexIsAtAngle(2, 90)) {
         QuadrupedRobot::moveAnkles(90);
-        delay(QuadrupedRobot::delayTime);
+        // delay(QuadrupedRobot::delayTime);
     }
     QuadrupedRobot::moveKnees(90);
 }
@@ -51,6 +56,7 @@ void QuadrupedRobot::moveIndex(int i, int angle) {
     for(int j = 0; j < 4; j++) {
         QuadrupedRobot::moveJoint(j, i, angle);
     }
+    delay(QuadrupedRobot::delayTime);
 }
 
 void QuadrupedRobot::moveHips(int angle) {
@@ -67,7 +73,7 @@ void QuadrupedRobot::moveAnkles(int angle) {
 
 int QuadrupedRobot::correctAngle(int legNum, int jointNum, int angle) {
     int correctedAngle;
-    if(legNum == 0 or legNum == 3) {
+    if(legNum == 0 or legNum == 2) {
         correctedAngle = 180 - angle;
     } else {
         correctedAngle = angle;
@@ -79,7 +85,7 @@ int QuadrupedRobot::correctAngle(int legNum, int jointNum, int angle) {
             }
             break;
         case 1:
-            correctedAngle = 180 - correctedAngle; //for knees: 0 will be vertical
+            correctedAngle = 180 - correctedAngle; //for knees: 0 is horizontal
             break;
         
         default:
