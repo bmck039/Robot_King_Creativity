@@ -16,6 +16,7 @@ class QuadrupedRobot {
         void moveAligned(int hipAngle, int kneeAngle);
         bool indexIsAtAngle(int i, int angle);
         int delayTime;
+        int defaultMoveTime;
     private:
         int correctAngle(int legNum, int jointNum, int angle);
         void moveIndexOverTime(int i, int angle, int moveTime);

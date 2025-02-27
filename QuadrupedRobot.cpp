@@ -8,6 +8,7 @@ QuadrupedRobot::QuadrupedRobot() {
     // int QuadrupedRobot::numLegs = numLegs;
     // int QuadrupedRobot::numJoints = numJoints;
     QuadrupedRobot::delayTime = 500;
+    QuadrupedRobot::defaultMoveTime = 100;
 }
 
 void QuadrupedRobot::initialize() {
@@ -24,10 +25,10 @@ void QuadrupedRobot::initialize() {
 
 void QuadrupedRobot::stand() {
 
-    QuadrupedRobot::moveHips(45, 500);
-    QuadrupedRobot::moveKnees(0, 500);
-    QuadrupedRobot::moveAnkles(90, 500);
-    QuadrupedRobot::moveKnees(90, 500);
+    QuadrupedRobot::moveHips(45, 1000);
+    QuadrupedRobot::moveKnees(0, 1000);
+    QuadrupedRobot::moveAnkles(0, 1000);
+    QuadrupedRobot::moveKnees(90, 1000);
 }
 
 bool QuadrupedRobot::indexIsAtAngle(int i, int angle) {
@@ -72,27 +73,27 @@ void QuadrupedRobot::moveJoint(int legNum, int jointNum, int angle) {
 }
 
 template<typename T> void QuadrupedRobot::executeFunctionOverTime(int moveTime, T&& f) {
-    for(int i = 0; i < moveTime; i++) {
+    long moveStartTime = millis();
+    long stepTime = 0;
+    for(int i = 0; i <= moveTime; i += stepTime) {
+        stepTime = millis() - moveStartTime;
         f(i);
-        delay(1);
     }
 }
 
 void QuadrupedRobot::moveIndexOverTime(int i, int angle, int moveTime) {
 
-    int currentAngle[] = {0, 0, 0, 0};
-    int anglePerStep[] = {0, 0, 0, 0};
+    int startAngle[] = {0, 0, 0, 0};
     for(int j = 0; j < 4; j++) {
         int setAngle = QuadrupedRobot::motors[j][i].read();
-        currentAngle[j] = setAngle;
-        anglePerStep[i] = (angle - setAngle) / moveTime;
+        startAngle[j] = setAngle;
     }
     auto function = [=](int t) {
         for(int j = 0; j < 4; j++) {
-           int moveAngle = anglePerStep[j] * t + currentAngle[j];
+           int moveAngle = map(t, moveTime, startAngle[j], angle);
+           moveAngle = constrain(moveAngle, startAngle[j], angle);
            QuadrupedRobot::moveJoint(j, i, moveAngle);
         }
-        
     };
 
     QuadrupedRobot::executeFunctionOverTime(moveTime, function);
@@ -118,7 +119,7 @@ void QuadrupedRobot::moveAnkles(int angle, int moveTime) {
 }
 
 void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
-    QuadrupedRobot::moveHips(hipAngle, 1);
-    QuadrupedRobot::moveKnees(kneeAngle, 1);
-    QuadrupedRobot::moveAnkles(90-kneeAngle, 1);
+    QuadrupedRobot::moveHips(hipAngle, QuadrupedRobot::defaultMoveTime);
+    QuadrupedRobot::moveKnees(kneeAngle, QuadrupedRobot::defaultMoveTime);
+    QuadrupedRobot::moveAnkles(90-kneeAngle, QuadrupedRobot::defaultMoveTime);
 }
