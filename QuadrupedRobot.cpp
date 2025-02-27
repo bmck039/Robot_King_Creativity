@@ -118,7 +118,7 @@ void QuadrupedRobot::moveAnkles(int angle, int moveTime) {
 }
 
 void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
-    QuadrupedRobot::moveHips(hipAngle);
-    QuadrupedRobot::moveKnees(kneeAngle);
-    QuadrupedRobot::moveAnkles(90-kneeAngle);
+    QuadrupedRobot::moveHips(hipAngle, 1);
+    QuadrupedRobot::moveKnees(kneeAngle, 1);
+    QuadrupedRobot::moveAnkles(90-kneeAngle, 1);
 }
