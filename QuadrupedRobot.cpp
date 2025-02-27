@@ -13,7 +13,7 @@ QuadrupedRobot::QuadrupedRobot() {
 void QuadrupedRobot::initialize() {
     QuadrupedRobot::moveHips(45);
     QuadrupedRobot::moveKnees(0);
-    QuadrupedRobot::moveAnkles(90);
+    QuadrupedRobot::moveAnkles(0);
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 3; j++) {
             QuadrupedRobot::motors[i][j].attach(4*j + i);
@@ -26,7 +26,7 @@ void QuadrupedRobot::stand() {
 
     QuadrupedRobot::moveHips(45);
     QuadrupedRobot::moveKnees(0);
-    QuadrupedRobot::moveAnkles(0);
+    QuadrupedRobot::moveAnkles(90);
     QuadrupedRobot::moveKnees(90);
 }
 
