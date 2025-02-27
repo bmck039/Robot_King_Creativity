@@ -8,14 +8,16 @@ class QuadrupedRobot {
         QuadrupedRobot();
         void initialize();
         void stand();
+        template<typename T> void executeFunctionOverTime(int moveTime, T&& f);
         void moveJoint(int legNum, int jointNum, int angle);
-        void moveHips(int angle);
-        void moveKnees(int angle);
-        void moveAnkles(int angle);
+        void moveHips(int angle, int moveTime);
+        void moveKnees(int angle, int moveTime);
+        void moveAnkles(int angle, int moveTime);
         bool indexIsAtAngle(int i, int angle);
         int delayTime;
     private:
         int correctAngle(int legNum, int jointNum, int angle);
+        void moveIndexOverTime(int i, int angle, int moveTime);
         void moveIndex(int i, int angle);
         Servo motors[4][3];
         
