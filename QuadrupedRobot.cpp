@@ -89,3 +89,9 @@ void QuadrupedRobot::moveJoint(int legNum, int jointNum, int angle) {
     int correctedAngle = QuadrupedRobot::correctAngle(legNum, jointNum, angle);
     QuadrupedRobot::motors[legNum][jointNum].write(correctedAngle);
 }
+
+void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
+    QuadrupedRobot::moveHips(hipAngle);
+    QuadrupedRobot::moveKnees(kneeAngle);
+    QuadrupedRobot::moveAnkles(90-kneeAngle);
+}
