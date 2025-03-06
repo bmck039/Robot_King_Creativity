@@ -36,26 +36,14 @@ void QuadrupedRobot::stand() {
     delay(defaultMoveTime);
 }
 
-void QuadrupedRobot::moveLeg(int i, int hipAngle, int kneeAngle, int ankleAngle, int moveTime) {
-    int legSetAngles[] = {hipAngle, kneeAngle, ankleAngle};
-    int startAngle[] = {0, 0, 0};
+void QuadrupedRobot::moveLeg(int i, int legAngles[], int moveTime) {
+    int moveAngles[4][3];
+    memcpy(setAngles, moveAngles, sizeof(setAngles));
     for(int j = 0; j < 3; j++) {
-        startAngle[j] = setAngles[i][j];
+        moveAngles[i][j] = legAngles[j];
     }
-    
-    auto function = [=](int t) {     
-        for(int j = 0; j < 3; j++) {
-           int moveAngle = map(t, 0, moveTime, startAngle[j], legSetAngles[j]);
-           if(startAngle[j] < legSetAngles[j]) {
-                moveAngle = constrain(moveAngle, startAngle[j], legSetAngles[j]);
-           } else {
-                moveAngle = constrain(moveAngle, legSetAngles[j], startAngle[j]);
-           }
-           QuadrupedRobot::moveJoint(i, j, moveAngle);
-        }
-    };
 
-    QuadrupedRobot::executeFunctionOverTime(moveTime, function);
+    QuadrupedRobot::moveJoints(moveAngles, moveTime);
 }
 
 bool QuadrupedRobot::indexIsAtAngle(int i, int angle) {
@@ -109,44 +97,25 @@ template<typename T> void QuadrupedRobot::executeFunctionOverTime(int moveTime, 
 }
 
 void QuadrupedRobot::moveIndexOverTime(int i, int angle, int moveTime) {
-    int startAngle[] = {0, 0, 0, 0};
+    int moveAngles[4][3];
+    memcpy(setAngles, moveAngles, sizeof(setAngles));
     for(int j = 0; j < 4; j++) {
-        startAngle[j] = setAngles[j][i];
+        moveAngles[j][i] = angle;
     }
-    auto function = [=](int t) {     
-        for(int j = 0; j < 4; j++) {
-           int moveAngle = map(t, 0, moveTime, startAngle[j], angle);
-           if(startAngle[j] < angle) {
-                moveAngle = constrain(moveAngle, startAngle[j], angle);
-           } else {
-                moveAngle = constrain(moveAngle, angle, startAngle[j]);
-           }
-           QuadrupedRobot::moveJoint(j, i, moveAngle);
-        }
-    };
     if(! QuadrupedRobot::indexIsAtAngle(i, angle)) {
-        QuadrupedRobot::executeFunctionOverTime(moveTime, function);
+        QuadrupedRobot::moveJoints(moveAngles, moveTime);
     }
     
     // delay(moveTime);
 }
 
-void QuadrupedRobot::moveJoints(int hipAngles[], int kneeAngles[], int ankleAngles[], int moveTime) {
+void QuadrupedRobot::moveJoints(int moveAngles[4][3], int moveTime) {
     int startAngles[4][3];
-    int motorAngles[4][3];
-    for(int i = 0; i < 4; i++) {
-        for(int j = 0; j < 3; j++) {
-            startAngles[i][j] = setAngles[i][j];
-        }
-        motorAngles[i][0] = hipAngles[i];
-        motorAngles[i][1] = kneeAngles[i];
-        motorAngles[i][2] = ankleAngles[i];
-    }
-
+    memcpy(setAngles, startAngles, sizeof(setAngles));
     auto function = [=](int t) {
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 3; j++) {
-                int angle = motorAngles[i][j];
+                int angle = moveAngles[i][j];
                 int moveAngle = map(t, 0, moveTime, startAngles[i][j], angle);
                 if(startAngles[i][j] < angle) {
                         moveAngle = constrain(moveAngle, startAngles[i][j], angle);
@@ -180,13 +149,11 @@ void QuadrupedRobot::moveAnkles(int angle, int moveTime) {
 }
 
 void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
-    int hipAngles[4];
-    int kneeAngles[4];
-    int ankleAngles[4];
+    int moveAngles[4][3];
     for(int i = 0; i < 4; i++) {
-        hipAngles[i] = hipAngle;
-        kneeAngles[i] = kneeAngle;
-        ankleAngles[i] = kneeAngle - 90;
+        moveAngles[i][0] = hipAngle;
+        moveAngles[i][1] = kneeAngle;
+        moveAngles[i][2] = kneeAngle - 90;
     }
-    QuadrupedRobot::moveJoints(hipAngles, kneeAngles, ankleAngles, QuadrupedRobot::defaultMoveTime);
+    QuadrupedRobot::moveJoints(moveAngles, QuadrupedRobot::defaultMoveTime);
 }
