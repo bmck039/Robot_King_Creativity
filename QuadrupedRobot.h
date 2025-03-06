@@ -20,12 +20,12 @@ class QuadrupedRobot {
         int delayTime;
         int defaultMoveTime;
         int setAngles[4][3];
+
     private:
         int correctAngle(int legNum, int jointNum, int angle);
         void moveIndexOverTime(int i, int angle, int moveTime);
         void moveIndex(int i, int angle);
         Servo motors[4][3];
-        
 };
 
 #endif

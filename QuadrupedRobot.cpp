@@ -38,7 +38,7 @@ void QuadrupedRobot::stand() {
 
 void QuadrupedRobot::moveLeg(int i, int legAngles[], int moveTime) {
     int moveAngles[4][3];
-    memcpy(setAngles, moveAngles, sizeof(setAngles));
+    memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     for(int j = 0; j < 3; j++) {
         moveAngles[i][j] = legAngles[j];
     }
@@ -98,7 +98,7 @@ template<typename T> void QuadrupedRobot::executeFunctionOverTime(int moveTime, 
 
 void QuadrupedRobot::moveIndexOverTime(int i, int angle, int moveTime) {
     int moveAngles[4][3];
-    memcpy(setAngles, moveAngles, sizeof(setAngles));
+    memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     for(int j = 0; j < 4; j++) {
         moveAngles[j][i] = angle;
     }
@@ -111,7 +111,7 @@ void QuadrupedRobot::moveIndexOverTime(int i, int angle, int moveTime) {
 
 void QuadrupedRobot::moveJoints(int moveAngles[4][3], int moveTime) {
     int startAngles[4][3];
-    memcpy(setAngles, startAngles, sizeof(setAngles));
+    memcpy(&startAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     auto function = [=](int t) {
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 3; j++) {
