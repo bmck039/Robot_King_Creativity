@@ -8,23 +8,27 @@ class QuadrupedRobot {
         QuadrupedRobot();
         void initialize();
         void stand();
-        template<typename T> void executeFunctionOverTime(int moveTime, T&& f);
-        void moveJoint(int legNum, int jointNum, int angle);
-        void moveHips(int angle, int moveTime);
-        void moveKnees(int angle, int moveTime);
-        void moveAnkles(int angle, int moveTime);
-        void moveAligned(int hipAngle, int kneeAngle);
-        bool indexIsAtAngle(int i, int angle);
-        void moveLeg(int i, int legAngles[], int moveTime);
-        void moveJoints(int moveAngles[4][3], int moveTime);
-        int delayTime;
+        template<typename T> void executeFunctionOverTime(char moveTime, T&& f);
+        void moveJoint(char legNum, char jointNum, char angle);
+        void moveHips(char angle, char moveTime);
+        void moveKnees(char angle, char moveTime);
+        void moveAnkles(char angle, char moveTime);
+        void moveAligned(char hipAngle, char kneeAngle);
+        bool indexIsAtAngle(char i, char angle);
+        void moveLeg(char i, char legAngles[], char moveTime);
+        void moveJoints(char moveAngles[4][3], char moveTime);
+        void safePosition();
+        void setCalibration(char offsetArray[4][3]);
+        void calibrate();
+        char delayTime;
         int defaultMoveTime;
-        int setAngles[4][3];
+        char setAngles[4][3];
+        char calibrationArray[4][3];
 
     private:
-        int correctAngle(int legNum, int jointNum, int angle);
-        void moveIndexOverTime(int i, int angle, int moveTime);
-        void moveIndex(int i, int angle);
+        char correctAngle(char legNum, char jointNum, char angle);
+        void moveIndexOverTime(char i, char angle, char moveTime);
+        void moveIndex(char i, char angle);
         Servo motors[4][3];
 };
 
