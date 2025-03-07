@@ -32,8 +32,8 @@ void QuadrupedRobot::stand() {
     delay(defaultMoveTime);
 }
 
-void QuadrupedRobot::moveLeg(char i, char legAngles[], char moveTime) {
-    char moveAngles[4][3];
+void QuadrupedRobot::moveLeg(char i, int legAngles[], int moveTime) {
+    int moveAngles[4][3];
     memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     for(char j = 0; j < 3; j++) {
         moveAngles[i][j] = legAngles[j];
@@ -42,10 +42,10 @@ void QuadrupedRobot::moveLeg(char i, char legAngles[], char moveTime) {
     QuadrupedRobot::moveJoints(moveAngles, moveTime);
 }
 
-bool QuadrupedRobot::indexIsAtAngle(char i, char angle) {
+bool QuadrupedRobot::indexIsAtAngle(char i, int angle) {
     bool isAtAngle = true;
     for (char j = 0; j < 4 && isAtAngle; j++) {
-        char setAngle = QuadrupedRobot::motors[j][i].read();
+        int setAngle = QuadrupedRobot::motors[j][i].read();
         char correctedAngle = QuadrupedRobot::correctAngle(j, i, angle);
         isAtAngle = isAtAngle && (setAngle == correctedAngle);
     }
@@ -53,8 +53,9 @@ bool QuadrupedRobot::indexIsAtAngle(char i, char angle) {
     
 }
 
-char QuadrupedRobot::correctAngle(char legNum, char jointNum, char angle) {
-    char correctedAngle;
+char QuadrupedRobot::correctAngle(char legNum, char jointNum, int angle) {
+    int correctedAngle;
+    angle += calibrationArray[legNum][jointNum];
     if(angle > 135 && jointNum == 0) {
         angle = 135; // safeguard to prevent legs crashing into the body
     }
@@ -72,11 +73,11 @@ char QuadrupedRobot::correctAngle(char legNum, char jointNum, char angle) {
         default:
             break;
     }
-    correctedAngle -= calibrationArray[legNum][jointNum];
+    correctedAngle = (correctedAngle, 0, 180);
     return correctedAngle;
 }
 
-void QuadrupedRobot::setCalibration(char offsetArray[4][3]) {
+void QuadrupedRobot::setCalibration(signed char offsetArray[4][3]) {
     memcpy(&calibrationArray[0][0], &offsetArray[0][0], sizeof(offsetArray[0][0]) * 4 * 3);
 }
 
@@ -89,7 +90,7 @@ void QuadrupedRobot::calibrate() {
             char currentOffset = 0;
             bool notEmpty = true;
             while(notEmpty) {
-                int result = Serial.parseInt();
+                signed char result = Serial.parseInt();
                 notEmpty = !(result == -1);
                 if(notEmpty) {
                     currentOffset += result;
@@ -106,16 +107,16 @@ void QuadrupedRobot::calibrate() {
     Serial.end();
 }
 
-void QuadrupedRobot::moveJoint(char legNum, char jointNum, char angle) {
+void QuadrupedRobot::moveJoint(char legNum, char jointNum, int angle) {
     setAngles[legNum][jointNum] = angle;
     char correctedAngle = QuadrupedRobot::correctAngle(legNum, jointNum, angle);
     QuadrupedRobot::motors[legNum][jointNum].write(correctedAngle);
     // delay(delayTime);
 }
 
-template<typename T> void QuadrupedRobot::executeFunctionOverTime(char moveTime, T&& f) {
-    char moveStartTime = millis();
-    char currentTime = 0;
+template<typename T> void QuadrupedRobot::executeFunctionOverTime(int moveTime, T&& f) {
+    int moveStartTime = millis();
+    int currentTime = 0;
     while(currentTime <= moveTime) {
         currentTime = millis() - moveStartTime;
         f(currentTime);
@@ -123,8 +124,8 @@ template<typename T> void QuadrupedRobot::executeFunctionOverTime(char moveTime,
     f(moveTime);
 }
 
-void QuadrupedRobot::moveIndexOverTime(char i, char angle, char moveTime) {
-    char moveAngles[4][3];
+void QuadrupedRobot::moveIndexOverTime(char i, int angle, int moveTime) {
+    int moveAngles[4][3];
     memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     for(char j = 0; j < 4; j++) {
         moveAngles[j][i] = angle;
@@ -136,14 +137,14 @@ void QuadrupedRobot::moveIndexOverTime(char i, char angle, char moveTime) {
     // delay(moveTime);
 }
 
-void QuadrupedRobot::moveJoints(char moveAngles[4][3], char moveTime) {
-    char startAngles[4][3];
+void QuadrupedRobot::moveJoints(int moveAngles[4][3], int moveTime) {
+    int startAngles[4][3];
     memcpy(&startAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
-    auto function = [=](char t) {
+    auto function = [=](int t) {
         for(char i = 0; i < 4; i++) {
             for(char j = 0; j < 3; j++) {
-                char angle = moveAngles[i][j];
-                char moveAngle = map(t, 0, moveTime, startAngles[i][j], angle);
+                int angle = moveAngles[i][j];
+                int moveAngle = map(t, 0, moveTime, startAngles[i][j], angle);
                 if(startAngles[i][j] < angle) {
                         moveAngle = constrain(moveAngle, startAngles[i][j], angle);
                 } else {
@@ -156,27 +157,27 @@ void QuadrupedRobot::moveJoints(char moveAngles[4][3], char moveTime) {
     executeFunctionOverTime(moveTime, function);
 }
 
-void QuadrupedRobot::moveIndex(char i, char angle) {
+void QuadrupedRobot::moveIndex(char i, int angle) {
     for(char j = 0; j < 4; j++) {
         QuadrupedRobot::moveJoint(j, i, angle);
     }
     // delay(QuadrupedRobot::delayTime);
 }
 
-void QuadrupedRobot::moveHips(char angle, char moveTime) {
+void QuadrupedRobot::moveHips(int angle, int moveTime) {
     QuadrupedRobot::moveIndexOverTime(0, angle, moveTime);
 }
 
-void QuadrupedRobot::moveKnees(char angle, char moveTime) {
+void QuadrupedRobot::moveKnees(int angle, int moveTime) {
     QuadrupedRobot::moveIndexOverTime(1, angle, moveTime);
 }
 
-void QuadrupedRobot::moveAnkles(char angle, char moveTime) {
+void QuadrupedRobot::moveAnkles(int angle, int moveTime) {
     QuadrupedRobot::moveIndexOverTime(2, angle, moveTime);
 }
 
-void QuadrupedRobot::moveAligned(char hipAngle, char kneeAngle) {
-    char moveAngles[4][3];
+void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
+    int moveAngles[4][3];
     for(char i = 0; i < 4; i++) {
         moveAngles[i][0] = hipAngle;
         moveAngles[i][1] = kneeAngle;
@@ -186,6 +187,6 @@ void QuadrupedRobot::moveAligned(char hipAngle, char kneeAngle) {
 }
 
 void QuadrupedRobot::safePosition() {
-    char setAngles[4][3] = {{45, 0, 0}, {45, 0, 0}, {45, 0, 0}, {45, 0, 0}};
+    int setAngles[4][3] = {{45, 0, 0}, {45, 0, 0}, {45, 0, 0}, {45, 0, 0}};
     QuadrupedRobot::moveJoints(setAngles, 1000);
 }
