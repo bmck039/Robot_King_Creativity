@@ -2,6 +2,7 @@
 #include "QuadrupedRobot.h"
 #include <Servo.h>
 
+//Initializer
 QuadrupedRobot::QuadrupedRobot() {
     // int numLegs = 4;
     // int numJoints = 3;
@@ -11,6 +12,7 @@ QuadrupedRobot::QuadrupedRobot() {
     QuadrupedRobot::defaultMoveTime = 250;
 }
 
+//attaches motors and stands
 void QuadrupedRobot::initialize() {
     QuadrupedRobot::moveHips(90, 1);
     QuadrupedRobot::moveKnees(0, 1);
@@ -24,6 +26,7 @@ void QuadrupedRobot::initialize() {
     QuadrupedRobot::stand();
 }
 
+//moves the motors to stand
 void QuadrupedRobot::stand() {
 
     QuadrupedRobot::safePosition();
@@ -32,6 +35,7 @@ void QuadrupedRobot::stand() {
     delay(defaultMoveTime);
 }
 
+//moves a particular leg to the specified angles over the course of moveTime ms.
 void QuadrupedRobot::moveLeg(int i, int legAngles[], int moveTime) {
     int moveAngles[4][3];
     memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
@@ -42,6 +46,7 @@ void QuadrupedRobot::moveLeg(int i, int legAngles[], int moveTime) {
     QuadrupedRobot::moveJoints(moveAngles, moveTime);
 }
 
+//checks to see if a particular joint type is at a specified angle
 bool QuadrupedRobot::indexIsAtAngle(int i, int angle) {
     bool isAtAngle = true;
     for (int j = 0; j < 4 && isAtAngle; j++) {
@@ -53,6 +58,8 @@ bool QuadrupedRobot::indexIsAtAngle(int i, int angle) {
     
 }
 
+
+//internal function to transform an angle into local coordinates for a particular motor
 int QuadrupedRobot::correctAngle(int legNum, int jointNum, int angle) {
     int correctedAngle;
     angle += QuadrupedRobot::calibrationArray[legNum][jointNum];
@@ -77,10 +84,12 @@ int QuadrupedRobot::correctAngle(int legNum, int jointNum, int angle) {
     return correctedAngle;
 }
 
+//sets the internal calibration array
 void QuadrupedRobot::setCalibration(int offsetArray[4][3]) {
     memcpy(&QuadrupedRobot::calibrationArray[0][0], &offsetArray[0][0], sizeof(offsetArray[0][0]) * 4 * 3);
 }
 
+//runs a Serial-interactive loop to adjust the calibration array. Sets the zero-point of each motor. Hips should point at right-angles to the body, knees should point fully vertical, and ankles should be at right-angles to the legs
 void QuadrupedRobot::calibrate() {
     Serial.begin(9600);
     String arrayResult = String("{");
@@ -119,6 +128,7 @@ void QuadrupedRobot::calibrate() {
     Serial.end();
 }
 
+//moves a particular joint to a specified angle
 void QuadrupedRobot::moveJoint(int legNum, int jointNum, int angle) {
     setAngles[legNum][jointNum] = angle;
     int correctedAngle = QuadrupedRobot::correctAngle(legNum, jointNum, angle);
@@ -126,6 +136,7 @@ void QuadrupedRobot::moveJoint(int legNum, int jointNum, int angle) {
     // delay(delayTime);
 }
 
+//Executes an input function incrementally over the course of moveTime milliseconds. the input function f should be a lambda function that takes an integer parameter that controls the execution progress
 template<typename T> void QuadrupedRobot::executeFunctionOverTime(int moveTime, T&& f) {
     int moveStartTime = millis();
     int currentTime = 0;
@@ -136,6 +147,7 @@ template<typename T> void QuadrupedRobot::executeFunctionOverTime(int moveTime, 
     f(moveTime);
 }
 
+//internal function to move a particular joint index to an angle over moveTime ms.
 void QuadrupedRobot::moveIndexOverTime(int i, int angle, int moveTime) {
     int moveAngles[4][3];
     memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
@@ -149,6 +161,7 @@ void QuadrupedRobot::moveIndexOverTime(int i, int angle, int moveTime) {
     // delay(moveTime);
 }
 
+//moves all joints to the specified angles over the course of moveTime ms.
 void QuadrupedRobot::moveJoints(int moveAngles[4][3], int moveTime) {
     int startAngles[4][3];
     memcpy(&startAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
@@ -169,6 +182,7 @@ void QuadrupedRobot::moveJoints(int moveAngles[4][3], int moveTime) {
     executeFunctionOverTime(moveTime, function);
 }
 
+//internal function to move a particular joint index to an angle immediately
 void QuadrupedRobot::moveIndex(int i, int angle) {
     for(int j = 0; j < 4; j++) {
         QuadrupedRobot::moveJoint(j, i, angle);
@@ -176,18 +190,22 @@ void QuadrupedRobot::moveIndex(int i, int angle) {
     // delay(QuadrupedRobot::delayTime);
 }
 
+//moves all hips to the specified angle over the course of moveTime ms
 void QuadrupedRobot::moveHips(int angle, int moveTime) {
     QuadrupedRobot::moveIndexOverTime(0, angle, moveTime);
 }
 
+//moves all knees to the specified angle over the course of moveTime ms
 void QuadrupedRobot::moveKnees(int angle, int moveTime) {
     QuadrupedRobot::moveIndexOverTime(1, angle, moveTime);
 }
 
+//moves all ankles to the specified angle over the course of moveTime ms
 void QuadrupedRobot::moveAnkles(int angle, int moveTime) {
     QuadrupedRobot::moveIndexOverTime(2, angle, moveTime);
 }
 
+//moves hips and knees to the specified angles and moves the ankles to a calculated angle to keep them pointing straight down
 void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
     int moveAngles[4][3];
     for(int i = 0; i < 4; i++) {
@@ -198,6 +216,7 @@ void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
     QuadrupedRobot::moveJoints(moveAngles, QuadrupedRobot::defaultMoveTime);
 }
 
+//moves the joints to a safe position
 void QuadrupedRobot::safePosition() {
     int setAngles[4][3] = {{45, 0, 0}, {45, 0, 0}, {45, 0, 0}, {45, 0, 0}};
     QuadrupedRobot::moveJoints(setAngles, 1000);
