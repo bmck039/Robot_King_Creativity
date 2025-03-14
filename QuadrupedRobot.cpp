@@ -1,6 +1,12 @@
 #include "Arduino.h"
 #include "QuadrupedRobot.h"
 #include <Servo.h>
+#include <math.h>
+
+QuadrupedRobot::delayTime = 10;
+QuadrupedRobot::defaultMoveTime = 250;
+// QuadrupedRobot::width = 70;
+// QuadrupedRobot::
 
 //Initializer
 QuadrupedRobot::QuadrupedRobot() {
@@ -8,8 +14,8 @@ QuadrupedRobot::QuadrupedRobot() {
     // int numJoints = 3;
     // int QuadrupedRobot::numLegs = numLegs;
     // int QuadrupedRobot::numJoints = numJoints;
-    QuadrupedRobot::delayTime = 10;
-    QuadrupedRobot::defaultMoveTime = 250;
+    // QuadrupedRobot::delayTime = 10;
+    // QuadrupedRobot::defaultMoveTime = 250;
     //Standardized in millimeters
     QuadrupedRobot::segmentLLength = 65; //Leg
     QuadrupedRobot::segmentBLength = 33; //Base
@@ -17,8 +23,6 @@ QuadrupedRobot::QuadrupedRobot() {
 }
 
 QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
-    QuadrupedRobot::delayTime = 10;
-    QuadrupedRobot::defaultMoveTime = 250;
     //Standardized in millimeters
     QuadrupedRobot::segmentLLength = legLength; //Leg
     QuadrupedRobot::segmentBLength = baseLength; //Base
@@ -235,8 +239,20 @@ void QuadrupedRobot::safePosition() {
     QuadrupedRobot::moveJoints(setAngles, 1000);
 }
 
-void QuadrupedRobot::positionFromCoordinates(int leg, int x, int y, int z) {
-    
+void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
+    // int xsign = QuadrupedRobot::xSign(legNum);
+    // int ysign = QuadrupedRobot::ySign(legNum);
+    // x = (xsign*x) - QuadrupedRobot::width/2;
+    // y = (ysign*y) - QuadrupedRobot::height/2;
+    int pi = 3.14159;
+    int hipAngle = atan(x/y) * 180 / pi;
+    int R = x/sin(baseAngle);
+    int r = R - QuadrupedRobot::segmentBLength;
+    int kneeAngle = 2 * atan((sqrt((QuadrupedRobot::segmentCLength)^2 - r^2) + QuadrupedRobot::segmentLLength) / r);
+    int ankleAngle = -2 * atan((sqrt(QuadrupedRobot::segmentCLength)^2 - r^2) / (QuadrupedRobot::segmentCLength +r));
+
+    int angles[] = {hipAngle, kneeAngle, ankleAngle};
+    QuadrupedRobot::moveLeg(legNum, angles, QuadrupedRobot::defaultMoveTime);
 }
 
 
