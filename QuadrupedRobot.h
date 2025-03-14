@@ -14,7 +14,7 @@ class QuadrupedRobot {
         //moves the motors to stand
         void stand();
 
-        //Executes an input function incrementally over the course of moveTime milliseconds. the input function f should take an integer parameter that controls the execution progress
+        //Executes an input function incrementally over the course of moveTime milliseconds. the input function f should be a lambda function that takes an integer parameter that controls the execution progress
         template<typename T> void executeFunctionOverTime(int moveTime, T&& f);
 
         //moves a particular joint to a specified angle
