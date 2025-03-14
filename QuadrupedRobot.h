@@ -58,7 +58,7 @@ class QuadrupedRobot {
         void calibrate();
 
         //positions the leg in such a way that the tip of the leg occupies the coordinates (x,y,z) millimeters in space in reference to the leg joint
-        void positionFromCoordinates(int x, int y, int z);
+        void positionFromCoordinates(int legNum, int x, int y, int z);
 
         //returns all 12 leg servo angles in an array
         AngleArray getCurrentPosition();
