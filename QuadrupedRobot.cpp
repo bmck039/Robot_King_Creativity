@@ -2,6 +2,7 @@
 #include "QuadrupedRobot.h"
 #include <Servo.h>
 #include <math.h>
+#include <array>
 
 QuadrupedRobot::delayTime = 10;
 QuadrupedRobot::defaultMoveTime = 250;
