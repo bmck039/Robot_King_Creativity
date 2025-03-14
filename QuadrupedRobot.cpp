@@ -3,8 +3,6 @@
 #include <Servo.h>
 #include <math.h>
 
-QuadrupedRobot::delayTime = 10;
-QuadrupedRobot::defaultMoveTime = 250;
 // QuadrupedRobot::width = 70;
 // QuadrupedRobot::
 
@@ -14,19 +12,23 @@ QuadrupedRobot::QuadrupedRobot() {
     // int numJoints = 3;
     // int QuadrupedRobot::numLegs = numLegs;
     // int QuadrupedRobot::numJoints = numJoints;
-    // QuadrupedRobot::delayTime = 10;
-    // QuadrupedRobot::defaultMoveTime = 250;
+    QuadrupedRobot::delayTime = 10;
+    QuadrupedRobot::defaultMoveTime = 250;
     //Standardized in millimeters
+    
     QuadrupedRobot::segmentLLength = 65; //Leg
     QuadrupedRobot::segmentBLength = 33; //Base
-    QuadrupedRobot::segmentCLength = 63: //Claw
+    QuadrupedRobot::segmentCLength = 63; //Claw
 }
 
 QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
     //Standardized in millimeters
     QuadrupedRobot::segmentLLength = legLength; //Leg
     QuadrupedRobot::segmentBLength = baseLength; //Base
-    QuadrupedRobot::segmentCLength = clawLength: //Claw
+    QuadrupedRobot::segmentCLength = clawLength; //Claw
+
+    QuadrupedRobot::delayTime = 10;
+    QuadrupedRobot::defaultMoveTime = 250;
 }
 
 //attaches motors and stands
@@ -244,17 +246,22 @@ void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
     // int ysign = QuadrupedRobot::ySign(legNum);
     // x = (xsign*x) - QuadrupedRobot::width/2;
     // y = (ysign*y) - QuadrupedRobot::height/2;
+    // if(){
+
+    // }
+    // if(){
+
+    // }
+    // if(){
+
+    // }
     int pi = 3.14159;
     int hipAngle = atan(x/y) * 180 / pi;
-    int R = x/sin(baseAngle);
-    int r = R - QuadrupedRobot::segmentBLength;
+    int r = x/sin(hipAngle);
+    // int r = R - QuadrupedRobot::segmentBLength;
     int kneeAngle = 2 * atan((sqrt((QuadrupedRobot::segmentCLength)^2 - r^2) + QuadrupedRobot::segmentLLength) / r);
-    int ankleAngle = -2 * atan((sqrt(QuadrupedRobot::segmentCLength)^2 - r^2) / (QuadrupedRobot::segmentCLength +r));
+    int ankleAngle = -2 * atan(sqrt((QuadrupedRobot::segmentCLength)^2 - r^2) / (QuadrupedRobot::segmentCLength + r));
 
     int angles[] = {hipAngle, kneeAngle, ankleAngle};
     QuadrupedRobot::moveLeg(legNum, angles, QuadrupedRobot::defaultMoveTime);
-}
-
-int QuadrupedRobot::getCurrentPosition() {
-    
 }
