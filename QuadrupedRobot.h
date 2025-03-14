@@ -8,6 +8,8 @@ class QuadrupedRobot {
         //Initializer
         QuadrupedRobot();
 
+        QuadrupedRobot(int legLength, int baseLength, int clawLength);
+
         //attaches motors and stands
         void initialize();
 
