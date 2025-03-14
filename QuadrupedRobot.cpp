@@ -255,8 +255,6 @@ void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
     QuadrupedRobot::moveLeg(legNum, angles, QuadrupedRobot::defaultMoveTime);
 }
 
-
-
 int QuadrupedRobot::getCurrentPosition() {
     
 }

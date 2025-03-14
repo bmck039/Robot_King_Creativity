@@ -82,6 +82,12 @@ class QuadrupedRobot {
         //internal array to keep track of calibration values
         int calibrationArray[4][3];
 
+        //Private calculation for aligning all coordinate planes for the leg position function
+        int xSign();
+
+        //Private calculation for aligning all coordinate planes for the leg position function
+        int ySign();
+
         //leg length
         int segmentLLength;
 
