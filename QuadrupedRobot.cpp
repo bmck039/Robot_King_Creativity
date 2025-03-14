@@ -230,7 +230,21 @@ void QuadrupedRobot::positionFromCoordinates(int leg, int x, int y, int z) {
     
 }
 
+int xSign (int legNum) {
+    if(legNum = 0 || legNum = 3){
+        return 1;
+    } else {
+        return -1;
+    }
+}
 
+int ySign (int legNum) {
+    if(legNum = 0 || legNum = 1){
+        return 1;
+    } else {
+        return -1;
+    }
+}
 
 int QuadrupedRobot::getCurrentPosition() {
     
