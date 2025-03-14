@@ -9,6 +9,10 @@ QuadrupedRobot::QuadrupedRobot() {
     // int QuadrupedRobot::numJoints = numJoints;
     QuadrupedRobot::delayTime = 10;
     QuadrupedRobot::defaultMoveTime = 250;
+    //Standardized in millimeters
+    QuadrupedRobot::segmentLLength = 65; //Leg
+    QuadrupedRobot::segmentBLength = 33; //Base
+    QuadrupedRobot::segmentCLength = 63: //Claw
 }
 
 void QuadrupedRobot::initialize() {
@@ -201,4 +205,14 @@ void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
 void QuadrupedRobot::safePosition() {
     int setAngles[4][3] = {{45, 0, 0}, {45, 0, 0}, {45, 0, 0}, {45, 0, 0}};
     QuadrupedRobot::moveJoints(setAngles, 1000);
+}
+
+void QuadrupedRobot::positionFromCoordinates(int leg, int x, int y, int z) {
+    
+}
+
+
+
+int QuadrupedRobot::getCurrentPosition() {
+    
 }

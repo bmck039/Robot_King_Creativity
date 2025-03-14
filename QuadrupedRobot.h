@@ -50,6 +50,12 @@ class QuadrupedRobot {
         //runs a Serial-interactive loop to adjust the calibration array. Sets the zero-point of each motor. Hips should point at right-angles to the body, knees should point fully vertical, and ankles should be at right-angles to the legs
         void calibrate();
 
+        //positions the leg in such a way that the tip of the leg occupies the coordinates (x,y,z) millimeters in space in reference to the leg joint
+        void positionFromCoordinates(int x, int y, int z);
+
+        //returns all 12 leg servo angles in an array
+        int getCurrentPosition();
+
         //time between motor moves
         int delayTime;
 
@@ -73,6 +79,15 @@ class QuadrupedRobot {
 
         //internal array to keep track of calibration values
         int calibrationArray[4][3];
+
+        //leg length
+        int segmentLLength;
+
+        //Base length
+        int segmentBLength;
+
+        //Claw length
+        int segmentCLength;
 };
 
 #endif
