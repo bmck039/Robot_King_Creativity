@@ -16,6 +16,15 @@ QuadrupedRobot::QuadrupedRobot() {
     QuadrupedRobot::segmentCLength = 63: //Claw
 }
 
+QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
+    QuadrupedRobot::delayTime = 10;
+    QuadrupedRobot::defaultMoveTime = 250;
+    //Standardized in millimeters
+    QuadrupedRobot::segmentLLength = legLength; //Leg
+    QuadrupedRobot::segmentBLength = baseLength; //Base
+    QuadrupedRobot::segmentCLength = clawLength: //Claw
+}
+
 //attaches motors and stands
 void QuadrupedRobot::initialize() {
     QuadrupedRobot::moveHips(90, 1);
