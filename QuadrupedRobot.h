@@ -5,6 +5,11 @@
 
 class QuadrupedRobot {
     public:
+
+        struct AngleArray {
+            int array[4][3]
+        }
+
         //Initializer
         QuadrupedRobot();
 
@@ -56,35 +61,35 @@ class QuadrupedRobot {
         void positionFromCoordinates(int x, int y, int z);
 
         //returns all 12 leg servo angles in an array
-        int getCurrentPosition();
+        AngleArray getCurrentPosition();
 
         //time between motor moves
         int delayTime;
 
         //default time that a move takes
         int defaultMoveTime;
-
-    private:
+        
+        private:
 
         //internal function to transform an angle into local coordinates for a particular motor
         int correctAngle(int legNum, int jointNum, int angle);
-
+        
         //internal function to move a particular joint index to an angle over moveTime ms.
         void moveIndexOverTime(int i, int angle, int moveTime);
 
         //internal function to move a particular joint index to an angle immediately
         void moveIndex(int i, int angle);
         Servo motors[4][3];
+        
+        //internal array to keep track of calibration values
+        int calibrationArray[4][3];
 
         //internal array to keep track of the angles each motor is set to
         int setAngles[4][3];
 
-        //internal array to keep track of calibration values
-        int calibrationArray[4][3];
-
         //Private calculation for aligning all coordinate planes for the leg position function
         int xSign();
-
+        
         //Private calculation for aligning all coordinate planes for the leg position function
         int ySign();
 
