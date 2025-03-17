@@ -259,8 +259,12 @@ void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
     int hipAngle = atan(x/y) * 180 / pi;
     int r = x/sin(hipAngle);
     // int r = R - QuadrupedRobot::segmentBLength;
-    int kneeAngle = 2 * atan((sqrt((QuadrupedRobot::segmentCLength)^2 - r^2) + QuadrupedRobot::segmentLLength) / r);
-    int ankleAngle = -2 * atan(sqrt((QuadrupedRobot::segmentCLength)^2 - r^2) / (QuadrupedRobot::segmentCLength + r));
+    int &c = QuadrupedRobot::segmentCLength;
+    int &l = QuadrupedRobot::segmentLLength;
+
+    float squareRoot = sqrt((2*c^2)*[l^2 + r^2 + z^2] + (2*l^2) * [r^2 + z^2] - 2*r^2 * z^2 - c^4 - l^4 - r^4 - z^4);
+    int kneeAngle = -2 * atan((2*l*r + squareRoot)/(c^2 - 2*l*z - l^2 - r^2 - z^2)) * 180 / pi;
+    int ankleAngle = 2 * atan((-2*c*l - squareRoot)/(c^2 + l^2 - r^2 - z^2)) * 180 / pi;
 
     int angles[] = {hipAngle, kneeAngle, ankleAngle};
     QuadrupedRobot::moveLeg(legNum, angles, QuadrupedRobot::defaultMoveTime);
