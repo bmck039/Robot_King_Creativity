@@ -13,6 +13,7 @@ class QuadrupedRobot {
         //Initializer
         QuadrupedRobot();
 
+        //Initializer
         QuadrupedRobot(int legLength, int baseLength, int clawLength);
 
         //attaches motors and stands
