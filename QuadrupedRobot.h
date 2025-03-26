@@ -66,12 +66,6 @@ class QuadrupedRobot {
         //returns all 12 leg servo angles in an array
         AngleArray getCurrentPosition();
 
-        //time between motor moves
-        int delayTime;
-
-        //default time that a move takes
-        int defaultMoveTime;
-
         //move the robot forward by repetitions steps
         void forward(int repetitions);
 
@@ -83,6 +77,24 @@ class QuadrupedRobot {
 
         //turn the robot left by repetitions steps
         void left(int repetitions);
+
+        int getXCoord(int (&angles)[3]);
+
+        int getYCoord(int (&angles)[3]);
+
+        int getZCoord(int (&angles)[3]);
+
+        void inverseKinematics(int legNum, int x, int y, int z, int &hipAngle, int &kneeAngle, int &ankleAngle);
+
+        void moveToPositions(int (&positions)[4][3]);
+
+        //time between motor moves
+        int delayTime;
+
+        //default time that a move takes
+        int defaultMoveTime;
+
+        int same;
         
         private:
 
@@ -94,6 +106,7 @@ class QuadrupedRobot {
 
         //internal function to move a particular joint index to an angle immediately
         void moveIndex(int i, int angle);
+        
         Servo motors[4][3];
         
         //internal array to keep track of calibration values
