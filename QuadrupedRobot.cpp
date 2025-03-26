@@ -255,26 +255,33 @@ void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
     // if(){
 
     // }
-    int pi = 3.14159;
-    int hipAngle = atan(x/y) * 180 / pi;
-    if(hipAngle < 0) { hipAngle += 180; }
-    int r = x/sin(hipAngle);
-    // int r = R - QuadrupedRobot::segmentBLength;
+    float pi = 3.14159;
+    int hipAngle = atan2(x, y) * 180 / pi;
+    if(hipAngle < 0) { hipAngle += 360; }
+    float R = (1.0*x)/sin(hipAngle * pi / 180);
+    float r = R - QuadrupedRobot::segmentBLength;
     int &c = QuadrupedRobot::segmentCLength;
     int &l = QuadrupedRobot::segmentLLength;
 
-    float squareRoot = sqrt((2*c^2)*[l^2 + r^2 + z^2] + (2*l^2) * [r^2 + z^2] - 2*r^2 * z^2 - c^4 - l^4 - r^4 - z^4);
-    int kneeAngle = -2 * atan((2*l*r + squareRoot)/(c^2 - 2*l*z - l^2 - r^2 - z^2)) * 180 / pi;
-    int ankleAngle = 2 * atan((-2*c*l - squareRoot)/(c^2 + l^2 - r^2 - z^2)) * 180 / pi;
+    float squareRoot = sqrt((2*pow(c, 2))*(pow(l, 2) + pow(r, 2) + pow(z, 2)) + (2*pow(l, 2)) * (pow(r, 2) + pow(z, 2)) - 2*pow(r,2) * pow(z, 2) - pow(c, 4) - pow(l, 4) - pow(r, 4) - pow(z, 4));
+    int kneeAngle = -2 * atan2((2*l*r + squareRoot), pow(c, 2) - 2*l*z - pow(l, 2) - pow(r, 2) - pow(z, 2)) * 180 / pi;
+    int ankleAngle = 2 * atan2((-2*c*l - squareRoot), (pow(c, 2) + pow(l, 2) - pow(r, 2) - pow(z, 2))) * 180 / pi;
 
-    if(kneeAngle < 0) { kneeAngle += 180; }
+    if(kneeAngle < 0) { kneeAngle += 360; }
+    if(ankleAngle < -calibrationArray[legNum][2]) { ankleAngle += 360; }
 
     int angles[] = {hipAngle, kneeAngle, ankleAngle};
     QuadrupedRobot::moveLeg(legNum, angles, QuadrupedRobot::defaultMoveTime);
+    Serial.begin(9600);
+    Serial.println(hipAngle);
+    Serial.println(kneeAngle);
+    Serial.println(ankleAngle);
+    Serial.end();
 }
 
 QuadrupedRobot::AngleArray QuadrupedRobot::getCurrentPosition() {
-    QuadrupedRobot::AngleArray angles;
-    angles.array = setAngles;
+    struct QuadrupedRobot::AngleArray angles;
+    // angles.array = QuadrupedRobot::setAngles;
+    memcpy(&angles.array[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     return angles;
 }

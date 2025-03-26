@@ -7,8 +7,8 @@ class QuadrupedRobot {
     public:
 
         struct AngleArray {
-            int array[4][3]
-        }
+            int array[4][3];
+        };
 
         //Initializer
         QuadrupedRobot();
