@@ -282,25 +282,38 @@ QuadrupedRobot::AngleArray QuadrupedRobot::getCurrentPosition() {
     return angles;
 }
 
-void forward (int repetitions) {
+void QuadrupedRobot::forward (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
-        
+        //right side step forward
+        QuadrupedRobot::moveLegAligned(0, 20, 45);
+        QuadrupedRobot::moveLegAligned(0, 20, 90);
+        QuadrupedRobot::moveLegAligned(3, 90, 45);
+        QuadrupedRobot::moveLegAligned(3, 90, 90);
+        //pull back
+        QuadrupedRobot::moveHips(45, QuadrupedRobot::defaultMoveTime);
+        //left side step forward
+        QuadrupedRobot::moveLegAligned(1, 20, 45);
+        QuadrupedRobot::moveLegAligned(1, 20, 90);
+        QuadrupedRobot::moveLegAligned(2, 90, 45);
+        QuadrupedRobot::moveLegAligned(2, 90, 90);
+        //pull back
+        QuadrupedRobot::moveHips(45, QuadrupedRobot::defaultMoveTime);
     }
 }
 
-void backward (int repetitions) {
+void QuadrupedRobot::backward (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
 
     }
 }
 
-void right (int repetitions) {
+void QuadrupedRobot::right (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
 
     }
 }
 
-void left (int repetitions) {
+void QuadrupedRobot::left (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
 
     }
