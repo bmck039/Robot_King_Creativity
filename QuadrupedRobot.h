@@ -69,6 +69,18 @@ class QuadrupedRobot {
 
         //default time that a move takes
         int defaultMoveTime;
+
+        //move the robot forward by repetitions steps
+        void forward(int repetitions);
+
+        //move the robot backward by repetitions steps
+        void backward(int repetitions);
+
+        //turn the robot right by repetitions steps
+        void right(int repetitions);
+
+        //turn the robot left by repetitions steps
+        void left(int repetitions);
         
         private:
 

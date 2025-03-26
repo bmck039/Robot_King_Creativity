@@ -285,3 +285,27 @@ QuadrupedRobot::AngleArray QuadrupedRobot::getCurrentPosition() {
     memcpy(&angles.array[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
     return angles;
 }
+
+void forward (int repetitions) {
+    for (int i = 0; i < repetitions; i++) {
+        
+    }
+}
+
+void backward (int repetitions) {
+    for (int i = 0; i < repetitions; i++) {
+
+    }
+}
+
+void right (int repetitions) {
+    for (int i = 0; i < repetitions; i++) {
+
+    }
+}
+
+void left (int repetitions) {
+    for (int i = 0; i < repetitions; i++) {
+
+    }
+}
