@@ -19,6 +19,8 @@ QuadrupedRobot::QuadrupedRobot() {
     QuadrupedRobot::segmentLLength = 65; //Leg
     QuadrupedRobot::segmentBLength = 33; //Base
     QuadrupedRobot::segmentCLength = 63; //Claw
+
+    QuadrupedRobot::same = -255;
 }
 
 QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
@@ -29,16 +31,31 @@ QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
 
     QuadrupedRobot::delayTime = 10;
     QuadrupedRobot::defaultMoveTime = 250;
+
+    QuadrupedRobot::same = -255;
+}
+
+int findInArray(int arr[], int element) {
+    for(int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++) {
+        if(arr[i] == element) return i;
+    }
+    return -1;
 }
 
 //attaches motors and stands
 void QuadrupedRobot::initialize() {
+    int overrideArray[] = {0, 1};
     QuadrupedRobot::moveHips(90, 1);
     QuadrupedRobot::moveKnees(0, 1);
     QuadrupedRobot::moveAnkles(90, 1);
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 3; j++) {
-            QuadrupedRobot::motors[i][j].attach(4*j + i);
+            int index = findInArray(overrideArray, 4*j + i);
+            if(index >= 0) {
+                QuadrupedRobot::motors[i][j].attach(12 + index);
+            } else {
+                QuadrupedRobot::motors[i][j].attach(4*j + i);
+            }
         }
     }
     // delay(1000);
@@ -250,29 +267,101 @@ void QuadrupedRobot::safePosition() {
     QuadrupedRobot::moveJoints(setAngles, 1000);
 }
 
-void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
+int QuadrupedRobot::getXCoord(int (&angles)[3]) {
     float pi = 3.14159;
-    int hipAngle = atan2(x, y) * 180 / pi;
-    if(hipAngle < 0) { hipAngle += 360; }
-    float R = (1.0*x)/sin(hipAngle * pi / 180);
-    float r = R - QuadrupedRobot::segmentBLength;
+
+    int &b = QuadrupedRobot::segmentBLength;
     int &c = QuadrupedRobot::segmentCLength;
     int &l = QuadrupedRobot::segmentLLength;
 
-    float squareRoot = sqrt((2*pow(c, 2))*(pow(l, 2) + pow(r, 2) + pow(z, 2)) + (2*pow(l, 2)) * (pow(r, 2) + pow(z, 2)) - 2*pow(r,2) * pow(z, 2) - pow(c, 4) - pow(l, 4) - pow(r, 4) - pow(z, 4));
-    int kneeAngle = -2 * atan2((2*l*r + squareRoot), pow(c, 2) - 2*l*z - pow(l, 2) - pow(r, 2) - pow(z, 2)) * 180 / pi;
-    int ankleAngle = 2 * atan2((-2*c*l - squareRoot), (pow(c, 2) + pow(l, 2) - pow(r, 2) - pow(z, 2))) * 180 / pi;
+    return (l*sin(angles[1] * pi / 180) + c*cos((angles[1] - angles[2]) * pi / 180) + b) * sin(angles[0] * pi / 180);
+}
 
-    if(kneeAngle < 0) { kneeAngle += 360; }
-    if(ankleAngle < -calibrationArray[legNum][2]) { ankleAngle += 360; }
+int QuadrupedRobot::getYCoord(int (&angles)[3]) {
+    float pi = 3.14159;
+
+    int &b = QuadrupedRobot::segmentBLength;
+    int &c = QuadrupedRobot::segmentCLength;
+    int &l = QuadrupedRobot::segmentLLength;
+
+    return (l*sin(angles[1] * pi / 180) + c*cos((angles[1] - angles[2]) * pi / 180) + b) * cos(angles[0] * pi / 180);
+}
+
+int QuadrupedRobot::getZCoord(int (&angles)[3]) {
+    float pi = 3.14159;
+
+    int &b = QuadrupedRobot::segmentBLength;
+    int &c = QuadrupedRobot::segmentCLength;
+    int &l = QuadrupedRobot::segmentLLength;
+
+    return (l*cos(angles[1] * pi / 180) - c*sin((angles[1] - angles[2]) * pi / 180) - b);
+}
+
+void QuadrupedRobot::inverseKinematics(int legNum, int x, int y, int z, int &hipAngle, int &kneeAngle, int &ankleAngle) {
+    float pi = 3.14159;
+
+    if(x == QuadrupedRobot::same) {
+        x = QuadrupedRobot::getXCoord(QuadrupedRobot::setAngles[legNum]);
+    }
+
+    if(y == QuadrupedRobot::same) {
+        y = QuadrupedRobot::getYCoord(QuadrupedRobot::setAngles[legNum]);
+    }
+
+    if(z == QuadrupedRobot::same) {
+        z = QuadrupedRobot::getZCoord(QuadrupedRobot::setAngles[legNum]);
+    }
+
+    hipAngle = atan2(x, y) * 180 / pi;
+    if(hipAngle < 0) { hipAngle += 360; }
+    // float R = (1.0*x)/sin(hipAngle * pi / 180);
+    // float r = R - QuadrupedRobot::segmentBLength;
+    // int &c = QuadrupedRobot::segmentCLength;
+    // int &l = QuadrupedRobot::segmentLLength;
+
+    // float squareRoot = sqrt((2*pow(c, 2))*(pow(l, 2) + pow(r, 2) + pow(z, 2)) + (2*pow(l, 2)) * (pow(r, 2) + pow(z, 2)) - 2*pow(r,2) * pow(z, 2) - pow(c, 4) - pow(l, 4) - pow(r, 4) - pow(z, 4));
+    // int kneeAngle = -2 * atan2((2*l*r + squareRoot), pow(c, 2) - 2*l*z - pow(l, 2) - pow(r, 2) - pow(z, 2)) * 180 / pi;
+    // int ankleAngle = 2 * atan2((-2*c*l - squareRoot), (pow(c, 2) + pow(l, 2) - pow(r, 2) - pow(z, 2))) * 180 / pi;
+
+    // if(kneeAngle < 0) { kneeAngle += 360; }
+    // if(ankleAngle < -calibrationArray[legNum][2]) { ankleAngle += 360; }
+
+    float r = sqrt(pow(x, 2) + pow(y, 2)) - QuadrupedRobot::segmentBLength;
+    int &c = QuadrupedRobot::segmentCLength;
+    int &l = QuadrupedRobot::segmentLLength;
+
+    float theta = atan2(z, r) * 180 / pi;
+    int length = sqrt(pow(r, 2) + pow(z, 2));
+    float gamma = acos((pow(length, 2) - pow(l, 2) - pow(c, 2))/(2*c*l)) * 180 / pi;
+    float phi = asin(c * sin(gamma * pi / 180) / length) * 180 / pi; 
+
+    kneeAngle = 90 - theta - phi;
+    ankleAngle = 90 - gamma;
+}
+
+void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
+    int hipAngle;
+    int kneeAngle;
+    int ankleAngle;
+    inverseKinematics(legNum, x, y, z, hipAngle, kneeAngle, ankleAngle);
 
     int angles[] = {hipAngle, kneeAngle, ankleAngle};
     QuadrupedRobot::moveLeg(legNum, angles, QuadrupedRobot::defaultMoveTime);
-    Serial.begin(9600);
-    Serial.println(hipAngle);
-    Serial.println(kneeAngle);
-    Serial.println(ankleAngle);
-    Serial.end();
+}
+
+void QuadrupedRobot::moveToPositions(int (&positions)[4][3]) {
+    int angles[4][3];
+    for(int i = 0; i < 4; i++) {
+        int hipAngle;
+        int kneeAngle;
+        int ankleAngle;
+        QuadrupedRobot::inverseKinematics(i, positions[i][0], positions[i][1], positions[i][2], hipAngle, kneeAngle, ankleAngle);
+        angles[i][0] = hipAngle;
+        angles[i][1] = kneeAngle;
+        angles[i][2] = ankleAngle;
+    }
+
+    QuadrupedRobot::moveJoints(angles, QuadrupedRobot::defaultMoveTime);
 }
 
 QuadrupedRobot::AngleArray QuadrupedRobot::getCurrentPosition() {
