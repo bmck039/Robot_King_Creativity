@@ -235,6 +235,15 @@ void QuadrupedRobot::moveAligned(int hipAngle, int kneeAngle) {
     QuadrupedRobot::moveJoints(moveAngles, QuadrupedRobot::defaultMoveTime);
 }
 
+void QuadrupedRobot::moveLegAligned(int legNum, int hipAngle, int kneeAngle) {
+    int moveAngles[4][3];
+    memcpy(&moveAngles[0][0], &setAngles[0][0], sizeof(setAngles[0][0]) * 4 * 3);
+    moveAngles[legNum][0] = hipAngle;
+    moveAngles[legNum][1] = kneeAngle;
+    moveAngles[legNum][2] = kneeAngle - 90;
+    QuadrupedRobot::moveJoints(moveAngles, QuadrupedRobot::defaultMoveTime);
+}
+
 //moves the joints to a safe position
 void QuadrupedRobot::safePosition() {
     int setAngles[4][3] = {{45, 0, 0}, {45, 0, 0}, {45, 0, 0}, {45, 0, 0}};
@@ -242,19 +251,6 @@ void QuadrupedRobot::safePosition() {
 }
 
 void QuadrupedRobot::positionFromCoordinates(int legNum, int x, int y, int z) {
-    // int xsign = QuadrupedRobot::xSign(legNum);
-    // int ysign = QuadrupedRobot::ySign(legNum);
-    // x = (xsign*x) - QuadrupedRobot::width/2;
-    // y = (ysign*y) - QuadrupedRobot::height/2;
-    // if(){
-
-    // }
-    // if(){
-
-    // }
-    // if(){
-
-    // }
     float pi = 3.14159;
     int hipAngle = atan2(x, y) * 180 / pi;
     if(hipAngle < 0) { hipAngle += 360; }

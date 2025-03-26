@@ -40,6 +40,8 @@ class QuadrupedRobot {
         //moves hips and knees to the specified angles and moves the ankles to a calculated angle to keep them pointing straight down
         void moveAligned(int hipAngle, int kneeAngle);
 
+        void moveLegAligned(int legNum, int hipAngle, int kneeAngle);
+
         //checks to see if a particular joint type is at a specified angle
         bool indexIsAtAngle(int i, int angle);
 
