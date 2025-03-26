@@ -290,14 +290,14 @@ void QuadrupedRobot::forward (int repetitions) {
         QuadrupedRobot::moveLegAligned(3, 90, 45);
         QuadrupedRobot::moveLegAligned(3, 90, 90);
         //pull back
-        QuadrupedRobot::moveHips(45, QuadrupedRobot::defaultMoveTime);
+        QuadrupedRobot::moveHips(45, 100);
         //left side step forward
         QuadrupedRobot::moveLegAligned(1, 20, 45);
         QuadrupedRobot::moveLegAligned(1, 20, 90);
         QuadrupedRobot::moveLegAligned(2, 90, 45);
         QuadrupedRobot::moveLegAligned(2, 90, 90);
         //pull back
-        QuadrupedRobot::moveHips(45, QuadrupedRobot::defaultMoveTime);
+        QuadrupedRobot::moveHips(45, 100);
     }
 }
 
