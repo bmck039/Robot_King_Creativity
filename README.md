@@ -9,6 +9,10 @@ This library contains many methods to make addressing each leg and each servo mu
 Inverse kinematics and related calculations are done within this library
 
 Documentation:
+
+* Place QuadrupedRobot.cpp and QuadrupedRobot.h in the Arduino/libraries/QuadrupedRobot folder
+* To use the library, simply place `#include "QuadrupedRobot"` at the top of your Arduino sketch.
+
 ```cpp
 //Initializer
 QuadrupedRobot();
