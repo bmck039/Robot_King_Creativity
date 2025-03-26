@@ -322,15 +322,15 @@ void QuadrupedRobot::backward (int repetitions) {
 
 void QuadrupedRobot::right (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
-        QuadrupedRobot::moveLegAligned(0, 20, 45);
-        QuadrupedRobot::moveLegAligned(0, 20, 90);
-        QuadrupedRobot::moveLegAligned(3, 90, 45);
-        QuadrupedRobot::moveLegAligned(3, 90, 90);
+        QuadrupedRobot::moveLegAligned(0, 90, 45);
+        QuadrupedRobot::moveLegAligned(0, 90, 90);
+        QuadrupedRobot::moveLegAligned(3, 20, 45);
+        QuadrupedRobot::moveLegAligned(3, 20, 90);
 
-        QuadrupedRobot::moveLegAligned(1, 90, 45);
-        QuadrupedRobot::moveLegAligned(1, 90, 90);
-        QuadrupedRobot::moveLegAligned(2, 20, 45);
-        QuadrupedRobot::moveLegAligned(2, 20, 90);
+        QuadrupedRobot::moveLegAligned(1, 20, 45);
+        QuadrupedRobot::moveLegAligned(1, 20, 90);
+        QuadrupedRobot::moveLegAligned(2, 90, 45);
+        QuadrupedRobot::moveLegAligned(2, 90, 90);
         //pull forward
         QuadrupedRobot::moveHips(45, 100);
     }
