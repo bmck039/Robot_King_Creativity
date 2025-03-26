@@ -31,14 +31,27 @@ QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
     QuadrupedRobot::defaultMoveTime = 250;
 }
 
+int findInArray(int arr[], int element) {
+    for(int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++) {
+        if(arr[i] == element) return i;
+    }
+    return -1;
+}
+
 //attaches motors and stands
 void QuadrupedRobot::initialize() {
+    int overrideArray[] = {};
     QuadrupedRobot::moveHips(90, 1);
     QuadrupedRobot::moveKnees(0, 1);
     QuadrupedRobot::moveAnkles(90, 1);
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 3; j++) {
-            QuadrupedRobot::motors[i][j].attach(4*j + i);
+            int index = findInArray(overrideArray, 4*j + i);
+            if(index >= 0) {
+                QuadrupedRobot::motors[i][j].attach(12 + index);
+            } else {
+                QuadrupedRobot::motors[i][j].attach(4*j + i);
+            }
         }
     }
     // delay(1000);
