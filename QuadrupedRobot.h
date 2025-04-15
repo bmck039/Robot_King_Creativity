@@ -14,7 +14,7 @@ class QuadrupedRobot {
         QuadrupedRobot();
 
         //Initializer
-        QuadrupedRobot(int legLength, int baseLength, int clawLength);
+        QuadrupedRobot(int legLength, int baseLength, int clawLength, int stepSize);
 
         //attaches motors and stands
         void initialize();
@@ -63,38 +63,51 @@ class QuadrupedRobot {
         //positions the leg in such a way that the tip of the leg occupies the coordinates (x,y,z) millimeters in space in reference to the leg joint
         void positionFromCoordinates(int legNum, int x, int y, int z);
 
+        
         //returns all 12 leg servo angles in an array
         AngleArray getCurrentPosition();
-
+        
         //move the robot forward by repetitions steps
         void forward(int repetitions);
-
+        
         //move the robot backward by repetitions steps
         void backward(int repetitions);
-
+        
         //turn the robot right by repetitions steps
         void right(int repetitions);
-
+        
         //turn the robot left by repetitions steps
         void left(int repetitions);
 
+        void rotateByAngle(int angle);
+        
         int getXCoord(int (&angles)[3]);
-
+        
         int getYCoord(int (&angles)[3]);
-
+        
         int getZCoord(int (&angles)[3]);
-
+        
         void inverseKinematics(int legNum, int x, int y, int z, int &hipAngle, int &kneeAngle, int &ankleAngle);
-
+        
         void moveToPositions(int (&positions)[4][3]);
-
+        
         //time between motor moves
         int delayTime;
-
+        
         //default time that a move takes
         int defaultMoveTime;
-
+        
         int same;
+
+        int zDown;
+
+        int zUp;
+
+        int xDefault;
+
+        int yDefault;
+
+        int stepSize;
         
         private:
 
