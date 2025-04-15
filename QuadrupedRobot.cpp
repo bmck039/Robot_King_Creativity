@@ -8,10 +8,7 @@
 
 //Initializer
 QuadrupedRobot::QuadrupedRobot() {
-    // int numLegs = 4;
-    // int numJoints = 3;
-    // int QuadrupedRobot::numLegs = numLegs;
-    // int QuadrupedRobot::numJoints = numJoints;
+
     QuadrupedRobot::delayTime = 10;
     QuadrupedRobot::defaultMoveTime = 250;
     //Standardized in millimeters
@@ -20,19 +17,28 @@ QuadrupedRobot::QuadrupedRobot() {
     QuadrupedRobot::segmentBLength = 33; //Base
     QuadrupedRobot::segmentCLength = 63; //Claw
 
+    QuadrupedRobot::zDown = -QuadrupedRobot::segmentCLength;
+    QuadrupedRobot::zUp = zDown / 2;
+    QuadrupedRobot::xDefault = (QuadrupedRobot::segmentBLength + QuadrupedRobot::segmentLLength) / sqrt(2);
+    QuadrupedRobot::yDefault = (QuadrupedRobot::segmentBLength + QuadrupedRobot::segmentLLength) / sqrt(2);;
+    QuadrupedRobot::stepSize = 30;
+
     QuadrupedRobot::same = -255;
 }
 
-QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength) {
+QuadrupedRobot::QuadrupedRobot(int legLength, int baseLength, int clawLength, int stepSize) {
+
+    QuadrupedRobot::QuadrupedRobot();
     //Standardized in millimeters
     QuadrupedRobot::segmentLLength = legLength; //Leg
     QuadrupedRobot::segmentBLength = baseLength; //Base
     QuadrupedRobot::segmentCLength = clawLength; //Claw
 
-    QuadrupedRobot::delayTime = 10;
-    QuadrupedRobot::defaultMoveTime = 250;
-
-    QuadrupedRobot::same = -255;
+    QuadrupedRobot::zDown = -QuadrupedRobot::segmentCLength;
+    QuadrupedRobot::zUp = zDown / 2;
+    QuadrupedRobot::xDefault = (QuadrupedRobot::segmentBLength + QuadrupedRobot::segmentLLength) / sqrt(2);
+    QuadrupedRobot::yDefault = (QuadrupedRobot::segmentBLength + QuadrupedRobot::segmentLLength) / sqrt(2);;
+    QuadrupedRobot::stepSize = stepSize;
 }
 
 int findInArray(int arr[], int element) {
@@ -44,7 +50,7 @@ int findInArray(int arr[], int element) {
 
 //attaches motors and stands
 void QuadrupedRobot::initialize() {
-    int overrideArray[] = {0, 1};
+    int overrideArray[] = {0};
     QuadrupedRobot::moveHips(90, 1);
     QuadrupedRobot::moveKnees(0, 1);
     QuadrupedRobot::moveAnkles(90, 1);
@@ -314,17 +320,6 @@ void QuadrupedRobot::inverseKinematics(int legNum, int x, int y, int z, int &hip
 
     hipAngle = atan2(x, y) * 180 / pi;
     if(hipAngle < 0) { hipAngle += 360; }
-    // float R = (1.0*x)/sin(hipAngle * pi / 180);
-    // float r = R - QuadrupedRobot::segmentBLength;
-    // int &c = QuadrupedRobot::segmentCLength;
-    // int &l = QuadrupedRobot::segmentLLength;
-
-    // float squareRoot = sqrt((2*pow(c, 2))*(pow(l, 2) + pow(r, 2) + pow(z, 2)) + (2*pow(l, 2)) * (pow(r, 2) + pow(z, 2)) - 2*pow(r,2) * pow(z, 2) - pow(c, 4) - pow(l, 4) - pow(r, 4) - pow(z, 4));
-    // int kneeAngle = -2 * atan2((2*l*r + squareRoot), pow(c, 2) - 2*l*z - pow(l, 2) - pow(r, 2) - pow(z, 2)) * 180 / pi;
-    // int ankleAngle = 2 * atan2((-2*c*l - squareRoot), (pow(c, 2) + pow(l, 2) - pow(r, 2) - pow(z, 2))) * 180 / pi;
-
-    // if(kneeAngle < 0) { kneeAngle += 360; }
-    // if(ankleAngle < -calibrationArray[legNum][2]) { ankleAngle += 360; }
 
     float r = sqrt(pow(x, 2) + pow(y, 2)) - QuadrupedRobot::segmentBLength;
     int &c = QuadrupedRobot::segmentCLength;
@@ -371,73 +366,115 @@ QuadrupedRobot::AngleArray QuadrupedRobot::getCurrentPosition() {
     return angles;
 }
 
+void rotateCoordinates(int angle, int startX, int startY, int &endX, int &endY) {
+    float pi = 3.14159;
+    endX = startX * cos(angle * pi / 180) - startY * sin(angle * pi / 180);
+    endY = startX * sin(angle * pi / 180) + startY * cos(angle * pi / 180);
+}
+
 void QuadrupedRobot::forward (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
-        //right side step forward
-        QuadrupedRobot::moveLegAligned(0, 20, 45);
-        QuadrupedRobot::moveLegAligned(0, 20, 90);
-        QuadrupedRobot::moveLegAligned(3, 90, 45);
-        QuadrupedRobot::moveLegAligned(3, 90, 90);
-        //pull back
-        QuadrupedRobot::moveHips(45, 100);
-        //left side step forward
-        QuadrupedRobot::moveLegAligned(1, 20, 45);
-        QuadrupedRobot::moveLegAligned(1, 20, 90);
-        QuadrupedRobot::moveLegAligned(2, 90, 45);
-        QuadrupedRobot::moveLegAligned(2, 90, 90);
-        //pull back
-        QuadrupedRobot::moveHips(45, 100);
+
+        QuadrupedRobot::positionFromCoordinates(2, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(2, QuadrupedRobot::xDefault + 20, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(2, QuadrupedRobot::same, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+        
+        QuadrupedRobot::positionFromCoordinates(3, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(3, QuadrupedRobot::xDefault + 20, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(3, QuadrupedRobot::same, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+
+        QuadrupedRobot::positionFromCoordinates(0, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(0, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(0, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+        
+        QuadrupedRobot::positionFromCoordinates(1, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(1, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(1, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+        
+
+
+        int coordinates[4][3] = {{QuadrupedRobot::same, QuadrupedRobot::yDefault - QuadrupedRobot::stepSize, QuadrupedRobot::zDown}, {QuadrupedRobot::same, QuadrupedRobot::yDefault - QuadrupedRobot::stepSize, QuadrupedRobot::zDown}, {QuadrupedRobot::same, QuadrupedRobot::yDefault + QuadrupedRobot::stepSize, QuadrupedRobot::zDown}, {QuadrupedRobot::same, QuadrupedRobot::yDefault + QuadrupedRobot::stepSize, QuadrupedRobot::zDown}};
+        QuadrupedRobot::moveToPositions(coordinates);
+
+    }
+    for(int i = 0; i < 4; i++) {
+        QuadrupedRobot::positionFromCoordinates(i, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(i, QuadrupedRobot::xDefault, QuadrupedRobot::yDefault, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(i, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zDown);
     }
 }
 
 void QuadrupedRobot::backward (int repetitions) {
     for (int i = 0; i < repetitions; i++) {
-        //right side step back
-        QuadrupedRobot::moveLegAligned(0, 90, 45);
-        QuadrupedRobot::moveLegAligned(0, 90, 90);
-        QuadrupedRobot::moveLegAligned(3, 20, 45);
-        QuadrupedRobot::moveLegAligned(3, 20, 90);
-        //pull forward
-        QuadrupedRobot::moveHips(45, 100);
-        //left side step back
-        QuadrupedRobot::moveLegAligned(1, 90, 45);
-        QuadrupedRobot::moveLegAligned(1, 90, 90);
-        QuadrupedRobot::moveLegAligned(2, 20, 45);
-        QuadrupedRobot::moveLegAligned(2, 20, 90);
-        //pull forward
-        QuadrupedRobot::moveHips(45, 100);
+
+        QuadrupedRobot::positionFromCoordinates(0, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(0, QuadrupedRobot::xDefault + 20, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(0, QuadrupedRobot::same, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+        
+        QuadrupedRobot::positionFromCoordinates(1, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(1, QuadrupedRobot::xDefault + 20, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(1, QuadrupedRobot::same, QuadrupedRobot::yDefault - 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+
+        QuadrupedRobot::positionFromCoordinates(2, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(2, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(2, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+        
+        QuadrupedRobot::positionFromCoordinates(3, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(3, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(3, QuadrupedRobot::same, QuadrupedRobot::yDefault + 2*QuadrupedRobot::stepSize, QuadrupedRobot::zDown);
+        
+
+
+        int coordinates[4][3] = {{QuadrupedRobot::same, QuadrupedRobot::yDefault + QuadrupedRobot::stepSize, QuadrupedRobot::zDown}, {QuadrupedRobot::same, QuadrupedRobot::yDefault + QuadrupedRobot::stepSize, QuadrupedRobot::zDown}, {QuadrupedRobot::same, QuadrupedRobot::yDefault - QuadrupedRobot::stepSize, QuadrupedRobot::zDown}, {QuadrupedRobot::same, QuadrupedRobot::yDefault - QuadrupedRobot::stepSize, QuadrupedRobot::zDown}};
+        QuadrupedRobot::moveToPositions(coordinates);
+
+    }
+    for(int i = 0; i < 4; i++) {
+        QuadrupedRobot::positionFromCoordinates(i, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zUp);
+        QuadrupedRobot::positionFromCoordinates(i, QuadrupedRobot::xDefault, QuadrupedRobot::yDefault, QuadrupedRobot::same);
+        QuadrupedRobot::positionFromCoordinates(i, QuadrupedRobot::same, QuadrupedRobot::same, QuadrupedRobot::zDown);
+    }
+}
+
+void QuadrupedRobot::rotateByAngle(int angle) {
+    int repetitions = abs(angle / 30);
+    for (int i = 0; i < repetitions; i++) {
+        int stepAngle = angle > 30 ? 30 : angle;
+        int rotatedX[] = {0, 0, 0, 0};
+        int rotatedY[] = {0, 0, 0, 0};
+        for(int i = 0; i < 4; i++) {
+            int sign;
+            switch (i) {
+            case 0:
+            case 2:
+                sign = 1;
+                break;
+            case 1:
+            case 3:
+                sign = -1;
+                break;
+            }
+            rotateCoordinates(stepAngle * sign, QuadrupedRobot::xDefault, QuadrupedRobot::yDefault, rotatedX[i], rotatedY[i]);
+            angle -= stepAngle;
+        }
+        for(int j = 0; j < 4; j++) {
+            int index = (j < 2) ? 2 * j : (j - 2) * 2 + 1;
+            QuadrupedRobot::positionFromCoordinates(index, QuadrupedRobot::xDefault, QuadrupedRobot::yDefault, QuadrupedRobot::zUp);
+            QuadrupedRobot::positionFromCoordinates(index, rotatedX[index], rotatedY[index], QuadrupedRobot::zUp);
+            QuadrupedRobot::positionFromCoordinates(index, rotatedX[index], rotatedY[index], QuadrupedRobot::zDown);
+        }
+        QuadrupedRobot::moveHips(45, QuadrupedRobot::defaultMoveTime);
     }
 }
 
 void QuadrupedRobot::right (int repetitions) {
-    for (int i = 0; i < repetitions; i++) {
-        QuadrupedRobot::moveLegAligned(0, 90, 45);
-        QuadrupedRobot::moveLegAligned(0, 90, 90);
-        QuadrupedRobot::moveLegAligned(3, 20, 45);
-        QuadrupedRobot::moveLegAligned(3, 20, 90);
-
-        QuadrupedRobot::moveLegAligned(1, 20, 45);
-        QuadrupedRobot::moveLegAligned(1, 20, 90);
-        QuadrupedRobot::moveLegAligned(2, 90, 45);
-        QuadrupedRobot::moveLegAligned(2, 90, 90);
-        //pull forward
-        QuadrupedRobot::moveHips(45, 100);
+    for(int i = 0; i < repetitions; i++) {
+        QuadrupedRobot::rotateByAngle(-30);
     }
 }
 
 void QuadrupedRobot::left (int repetitions) {
-    for (int i = 0; i < repetitions; i++) {
-        //right side step back
-        QuadrupedRobot::moveLegAligned(0, 90, 45);
-        QuadrupedRobot::moveLegAligned(0, 90, 90);
-        QuadrupedRobot::moveLegAligned(3, 20, 45);
-        QuadrupedRobot::moveLegAligned(3, 20, 90);
-        //left side step forward
-        QuadrupedRobot::moveLegAligned(1, 20, 45);
-        QuadrupedRobot::moveLegAligned(1, 20, 90);
-        QuadrupedRobot::moveLegAligned(2, 90, 45);
-        QuadrupedRobot::moveLegAligned(2, 90, 90);
-        //orient properly
-        QuadrupedRobot::moveHips(45, 100);
+    for(int i = 0; i < repetitions; i++) {
+        QuadrupedRobot::rotateByAngle(30);
     }
 }
